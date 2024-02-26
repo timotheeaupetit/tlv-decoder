@@ -158,9 +158,9 @@ class TLVManagerTest extends AnyFunSpec {
     }
   }
 
-  describe("decodeCDR") {
+  describe("decodeSequence") {
     it("should ignore irrelevant level 1 tag 8666") {
-      val lvl1 = hex"8666800255118077800C80020008800E800400000123"
+      val lvl1 = hex"8666800255118077800C80028008800E800400000123"
 
       val result = TLVManager.decodeSequence(lvl1)
       assert(result.size == 1)
@@ -168,7 +168,7 @@ class TLVManagerTest extends AnyFunSpec {
     }
 
     it("should ignore irrelevant level 2 tag 8088") {
-      val lvl2 = hex"80888002551180020008800E800400000123"
+      val lvl2 = hex"80888002551180028008800E800400000123"
 
       val result = TLVManager.decodeSequence(lvl2, hex"8057")
       assert(result.size == 1)
