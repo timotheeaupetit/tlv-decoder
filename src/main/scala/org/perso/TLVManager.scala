@@ -7,6 +7,7 @@ import java.math.BigInteger
 import scala.annotation.tailrec
 
 object TLVManager extends App {
+  private val headers = Set[ByteVector](hex"8077", hex"8057")
 
   /** Decode bytes one by one as ASCII characters, then concatenate them to form a string
    * @param bytes ByteVector to decode
@@ -54,7 +55,7 @@ object TLVManager extends App {
       val (tag, length) = x._2.splitAt(2)
       val nbBytes = lengthToLong(length)
       x._1.consume(nbBytes)(v => v.acquire(nbBytes)) match
-        case Right(y) if Set(hex"8057", hex"8077").contains(tag) => splitMessage(y._1, acc :+ (tag ++ length ++ y._2))
+        case Right(y) if headers.contains(tag) => splitMessage(y._1, acc :+ (tag ++ length ++ y._2))
         case Right(y) => splitMessage(y._1, acc)
         case Left(_) => splitMessage(x._1, acc)
     case Left(_) => acc
@@ -80,10 +81,10 @@ object TLVManager extends App {
 
       parentTag match {
         case ByteVector.empty => tag match { // level 1
-          case t if Set(hex"8077", hex"8057").contains(t) => decodeSequence(value, t, kv) // go to level 2
+          case t if headers.contains(t) => decodeSequence(value, t, kv) // go to level 2
           case _ => decodeSequence(remain, parentTag, kv) // ignore every other level 1 tags
         }
-        case pt if Set(hex"8077", hex"8057").contains(pt) => tag match { // level 2
+        case pt if headers.contains(pt) => tag match { // level 2
           case t if t == hex"8002" => decodeSequence(value, t, kv) // go to level 3
           case _ => decodeSequence(remain, pt, kv) // ignore every other level 2 tags
         }
