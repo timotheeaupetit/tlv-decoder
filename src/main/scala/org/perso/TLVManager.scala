@@ -80,10 +80,10 @@ object TLVManager extends App {
 
       parentTag match {
         case ByteVector.empty => tag match { // level 1
-          case t if Set("8077", "8057").contains(t) => decodeSequence(value, t, kv) // go to level 2
+          case t if Set(hex"8077", hex"8057").contains(t) => decodeSequence(value, t, kv) // go to level 2
           case _ => decodeSequence(remain, parentTag, kv) // ignore every other level 1 tags
         }
-        case pt if Set("8077", "8057").contains(pt) => tag match { // level 2
+        case pt if Set(hex"8077", hex"8057").contains(pt) => tag match { // level 2
           case t if t == hex"8002" => decodeSequence(value, t, kv) // go to level 3
           case _ => decodeSequence(remain, pt, kv) // ignore every other level 2 tags
         }
