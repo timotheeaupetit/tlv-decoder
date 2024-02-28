@@ -3,7 +3,6 @@ package org.perso
 
 import scodec.bits.*
 
-import java.math.BigInteger
 import scala.annotation.tailrec
 
 object TLVManager extends App {
@@ -27,8 +26,7 @@ object TLVManager extends App {
    * @return the decoded long integer as string
    */
   def toLongTimestamp(bytes: ByteVector): String = {
-    val bigInteger = new BigInteger(bytes.toHex, 16)
-    val diff = bigInteger.longValue() - 2208988800L
+    val diff = bytes.toLong(signed = false).longValue() - 2208988800L
     diff.toString
   }
 
