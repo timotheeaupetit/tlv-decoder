@@ -15,8 +15,14 @@ class TLVManagerTest extends AnyFunSpec {
   }
 
   describe("toInt") {
-    it("should convert bytes to string integer") {
+    it("should decode hex'00000000' to '0'") {
+      assert(TLVManager.toInt(hex"00000000") === "0")
+    }
+    it("should decode hex'00000014' to '20'") {
       assert(TLVManager.toInt(hex"00000014") === "20")
+    }
+    it("should decode hex'00000123' to '291'") {
+      assert(TLVManager.toInt(hex"00000123") === "291")
     }
   }
 

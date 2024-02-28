@@ -20,13 +20,7 @@ object TLVManager extends App {
    * @param bytes ByteVector to decode
    * @return the decoded integer as string
    */
-  def toInt(bytes: ByteVector): String = {
-    try {
-      Integer.parseInt(bytes.toHex, 16).toString
-    } catch {
-      case _: Throwable => ""
-    }
-  }
+  def toInt(bytes: ByteVector): String = bytes.toInt(signed = false).toString
 
   /** Decode bytes as an epoch timestamp, then convert it to string.
    * @param bytes ByteVector to decode
