@@ -42,14 +42,17 @@ object TLVManager {
   def lengthToLong(l: ByteVector): Long = computeLength(l).toLong()
 
   @tailrec
-  def splitMessage(bytes: ByteVector, acc: List[ByteVector] = List()): List[ByteVector] = bytes.consume(4)(v => v.acquire(4)) match
-    case Right(x) =>
-      val (tag, length) = x._2.splitAt(2)
+  def splitMessage(bytes: ByteVector,
+                   acc: List[ByteVector] = List()): List[ByteVector] = bytes.consume(4)(_.acquire(4)) match
+    case Right((remain, tl)) =>
+      val (tag, length) = tl.splitAt(2)
       val nbBytes = lengthToLong(length)
-      x._1.consume(nbBytes)(v => v.acquire(nbBytes)) match
-        case Right(y) if headers.contains(tag) => splitMessage(y._1, acc :+ (tag ++ length ++ y._2))
-        case Right(y) => splitMessage(y._1, acc)
-        case Left(_) => splitMessage(x._1, acc)
+      remain.consume(nbBytes)(_.acquire(nbBytes)) match
+        case Right((remain, value)) if headers.contains(tag) =>
+          val sequence = tag ++ length ++ value
+          splitMessage(remain, acc :+ sequence)
+        case Right((remain, _)) => splitMessage(remain, acc)
+        case Left(_) => splitMessage(remain, acc)
     case Left(_) => acc
 
   /** Decode a single sequence from TLV to key-value pairs
