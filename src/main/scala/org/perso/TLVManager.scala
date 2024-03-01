@@ -1,11 +1,11 @@
 package org.perso
 
-
 import scodec.bits.*
 
 import scala.annotation.tailrec
 
-object TLVManager extends App {
+
+object TLVManager {
   private val headers = Set[ByteVector](hex"8077", hex"8057")
 
   /** Decode bytes one by one as ASCII characters, then concatenate them to form a string
